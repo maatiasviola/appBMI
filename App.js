@@ -1,20 +1,52 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
 
-export default function App() {
+import * as SplashScreen from "expo-splash-screen";
+
+import Tabs from "./navigation/tabs";
+import Calendario from "./screens/Calendario";
+import Comunidad from "./screens/Comunidad";
+import Notificaciones from "./screens/Notificaciones";
+import Menu from "./screens/Menu";
+import { useFonts } from "expo-font";
+import { Text } from "react-native";
+
+const Stack = createStackNavigator();
+
+const App = () => {
+  const [fontsLoaded] = useFonts({
+    RobotoBlack: require("./assets/fonts/Roboto-Black.ttf"),
+    RobotoBold: require("./assets/fonts/Roboto-Bold.ttf"),
+    RobotoRegular: require("./assets/fonts/Roboto-Regular.ttf"),
+  });
+  useEffect(() => {
+    SplashScreen.preventAutoHideAsync();
+  }, []);
+
+  const onLayout = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return <Text>Cargando...</Text>;
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+        initialRouteName={"Agregar"}
+      >
+        <Stack.Screen name="Agregar" component={Tabs} />
+        <Stack.Screen name="Calendario" component={Calendario} />
+        <Stack.Screen name="Comunidad" component={Comunidad} />
+        <Stack.Screen name="Notificaciones" component={Notificaciones} />
+        <Stack.Screen name="Menu" component={Menu} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
